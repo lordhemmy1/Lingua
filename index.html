@@ -7,23 +7,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Introduction Modal -->
     <div id="intro-modal" class="modal active">
         <div class="modal-content">
-            <h2>Welcome to LINGUA! 🇬🇧</h2>
-            <input type="text" id="player-name" placeholder="Enter your name">
-            <button id="start-game">Begin Learning</button>
+            <h2>Welcome to LINGUA! 🎓</h2>
+            <input type="text" id="player-name" placeholder="Enter your name" required>
+            <button id="start-game">Start Learning</button>
+            <div id="high-scores"></div>
         </div>
     </div>
 
-    <!-- Game Interface -->
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <div id="game-over-content"></div>
+        </div>
+    </div>
+
     <header>
         <h1>LINGUA Language Mastery</h1>
         <div id="player-info">
             <span id="current-player">Guest</span> | 
-            Level: <span id="current-level">Beginner</span> | 
-            Sublevel: <span id="current-sublevel">0/500</span> | 
-            Score: <span id="current-score">0</span>
+            Score: <span id="current-score">0</span> | 
+            Attempts Left: <span id="attempts-left">3</span>
         </div>
         <div class="progress-container">
             <div class="progress-bar"></div>
@@ -41,7 +45,6 @@
         </section>
     </main>
 
-    <script src="game-data.json"></script>
     <script src="script.js"></script>
 </body>
 </html>
