@@ -1,11 +1,17 @@
 // Global Game State
 const gameState = {
-  currentLevel: null,
-  currentSublevel: 0,
+  currentLevel: "beginner",  // default to beginner level
+  currentSublevel: 1,
   totalSublevels: 20,
   currentQuestion: null,
-  currentAnswer: null
+  currentAnswer: null,
+  trialCount: 0, // count of attempts per question
+  score: 0,
+  playerName: ""
 };
+
+// Use localStorage to store previous scores as an array of objects: { name, score }
+const SCORE_STORAGE_KEY = "linguaScores";
 
 // Beginner sublevel topics and generators
 const beginnerSublevels = [
@@ -34,7 +40,6 @@ const beginnerSublevels = [
     name: "Combine Letters to Form a Word",
     description: "Arrange the letters to form a common word.",
     generateQuestion: function () {
-      // Sample word list for demonstration
       const words = ["cat", "dog", "sun", "book", "tree"];
       const word = words[Math.floor(Math.random() * words.length)];
       // Shuffle the letters
@@ -47,10 +52,9 @@ const beginnerSublevels = [
     name: "Singular and Plural",
     description: "Type the plural form of the given noun.",
     generateQuestion: function () {
-      // Sample nouns
       const nouns = ["cat", "dog", "apple", "book"];
       const noun = nouns[Math.floor(Math.random() * nouns.length)];
-      // Naively add "s" for plural; can be extended for irregulars
+      // Naively add "s" for plural (can be extended)
       gameState.currentAnswer = noun + "s";
       return `What is the plural form of: <strong>${noun}</strong>?`;
     }
@@ -59,7 +63,6 @@ const beginnerSublevels = [
     name: "Words and Opposites",
     description: "Provide the opposite of the given word.",
     generateQuestion: function () {
-      // Sample words and their opposites
       const opposites = {
         hot: "cold",
         up: "down",
@@ -76,7 +79,6 @@ const beginnerSublevels = [
     name: "Parts of Speech",
     description: "Identify the part of speech for the given word.",
     generateQuestion: function () {
-      // Sample words with parts of speech
       const parts = [
         { word: "run", pos: "verb" },
         { word: "happy", pos: "adjective" },
@@ -85,16 +87,15 @@ const beginnerSublevels = [
       ];
       const item = parts[Math.floor(Math.random() * parts.length)];
       gameState.currentAnswer = item.pos;
-      return `What part of speech is the word: <strong>${item.word}</strong>? <br> (Answer options: noun, verb, adjective, adverb)`;
+      return `What part of speech is the word: <strong>${item.word}</strong>?<br>(noun, verb, adjective, adverb)`;
     }
   },
   {
     name: "Sentence Formation",
     description: "Form a complete sentence using the given words.",
     generateQuestion: function () {
-      // For demo, provide words and expect user to form a sentence (answer not auto-checkable)
       const words = ["I", "love", "learning", "English"];
-      gameState.currentAnswer = ""; // Open answer; teacher check or auto-check later
+      gameState.currentAnswer = ""; // open answer; manual review if needed
       return `Use the following words to form a sentence (order is not fixed): <br><strong>${words.join(" ")}</strong>`;
     }
   },
@@ -102,7 +103,6 @@ const beginnerSublevels = [
     name: "Present to Past Tense",
     description: "Convert the present tense sentence to past tense.",
     generateQuestion: function () {
-      // A simple conversion example
       const sentences = [
         { present: "I walk to school.", past: "I walked to school." },
         { present: "She eats an apple.", past: "She ate an apple." }
@@ -112,15 +112,61 @@ const beginnerSublevels = [
       return `Convert this sentence to past tense: <br><strong>${sent.present}</strong>`;
     }
   }
-  // ... You can add more sublevel objects up to 20 covering all beginner topics.
 ];
 
-// For demonstration, if we have less than 20, we cycle/repeat some topics.
+// If there are less than 20 sublevels, repeat some to fill up.
 while (beginnerSublevels.length < 20) {
   beginnerSublevels.push(...beginnerSublevels.slice(0, 20 - beginnerSublevels.length));
 }
 
-// Function to load a particular level
+// --------------------
+// Modal helper functions
+// --------------------
+function showModal(contentHTML, callback) {
+  const popup = document.getElementById("popup-modal");
+  const popupContent = document.getElementById("popup-content");
+  popupContent.innerHTML = contentHTML;
+  popup.style.display = "block";
+  // If callback is provided, call it when user clicks anywhere in the modal
+  popup.onclick = function () {
+    popup.style.display = "none";
+    if (callback) callback();
+  };
+}
+
+function showIntroModal() {
+  document.getElementById("intro-modal").style.display = "block";
+}
+
+function hideIntroModal() {
+  document.getElementById("intro-modal").style.display = "none";
+}
+
+// --------------------
+// Score Management
+// --------------------
+function updateScore(amount) {
+  gameState.score += amount;
+  document.getElementById("current-score").textContent = gameState.score;
+}
+
+function saveScore() {
+  let scores = JSON.parse(localStorage.getItem(SCORE_STORAGE_KEY)) || [];
+  scores.push({ name: gameState.playerName, score: gameState.score });
+  localStorage.setItem(SCORE_STORAGE_KEY, JSON.stringify(scores));
+}
+
+function checkForHighScore() {
+  let scores = JSON.parse(localStorage.getItem(SCORE_STORAGE_KEY)) || [];
+  const maxScore = scores.reduce((max, entry) => (entry.score > max ? entry.score : max), 0);
+  if (gameState.score > maxScore) {
+    showModal(`<h3>New High Score!</h3><p>Congratulations, ${gameState.playerName}! Your score is now ${gameState.score}.</p>`);
+  }
+}
+
+// --------------------
+// Game Flow Functions
+// --------------------
 function loadLevel(level) {
   gameState.currentLevel = level;
   if (level === "beginner") {
@@ -131,9 +177,8 @@ function loadLevel(level) {
   }
 }
 
-// Function to display beginner sublevels menu
 function loadBeginnerMenu() {
-  gameState.currentSublevel = 0;
+  gameState.currentSublevel = 1;
   const container = document.getElementById("game-container");
   let html = `<h2>Beginner Level</h2>`;
   html += `<p>Select a sublevel (1 to ${gameState.totalSublevels}):</p>`;
@@ -143,7 +188,6 @@ function loadBeginnerMenu() {
   }
   html += `</div>`;
   container.innerHTML = html;
-  // Add event listeners for sublevel buttons
   document.querySelectorAll(".sublevel-btn").forEach(btn => {
     btn.addEventListener("click", function () {
       const sublevel = parseInt(this.getAttribute("data-sublevel"));
@@ -152,17 +196,16 @@ function loadBeginnerMenu() {
   });
 }
 
-// Function to start a particular beginner sublevel
 function startSublevel(sublevelNumber) {
   gameState.currentSublevel = sublevelNumber;
-  // Use the corresponding sublevel generator (wrap-around if necessary)
+  gameState.trialCount = 0;
+  // Use the corresponding sublevel generator (wrap-around if needed)
   const index = (sublevelNumber - 1) % beginnerSublevels.length;
   const sublevelData = beginnerSublevels[index];
   const questionHTML = sublevelData.generateQuestion();
   displayQuestion(sublevelData.name, questionHTML);
 }
 
-// Function to display a question and answer input area
 function displayQuestion(topic, questionHTML) {
   const container = document.getElementById("game-container");
   let html = `<h2>Beginner - Sublevel ${gameState.currentSublevel}: ${topic}</h2>`;
@@ -172,31 +215,102 @@ function displayQuestion(topic, questionHTML) {
   html += `<button id="back-to-menu">Back to Sublevels</button>`;
   html += `<div class="feedback" id="feedback"></div>`;
   container.innerHTML = html;
-
   document.getElementById("submit-answer").addEventListener("click", checkAnswer);
   document.getElementById("back-to-menu").addEventListener("click", loadBeginnerMenu);
 }
 
-// Function to check the answer
 function checkAnswer() {
   const userAnswer = document.getElementById("user-answer").value.trim().toLowerCase();
   const correctAnswer = (gameState.currentAnswer || "").toLowerCase();
-
   const feedbackEl = document.getElementById("feedback");
 
-  // For open answer questions (like sentence formation), skip strict checking.
+  // For open answers (like sentence formation), we simply record the answer.
   if (correctAnswer === "") {
-    feedbackEl.innerHTML = "Your answer has been recorded. (In a real app, this might be reviewed later.)";
-  } else if (userAnswer === correctAnswer) {
-    feedbackEl.innerHTML = "Correct!";
+    feedbackEl.innerHTML = `<span class="correct-icon">&#10004;</span> Your answer has been recorded.`;
+    updateScore(1);
+    setTimeout(() => levelComplete(), 1500);
+    return;
+  }
+
+  // Check answer
+  if (userAnswer === correctAnswer) {
+    feedbackEl.innerHTML = `<span class="correct-icon">&#10004;</span> Correct!`;
+    updateScore(1);
+    setTimeout(() => levelComplete(), 1500);
   } else {
-    feedbackEl.innerHTML = `Incorrect. The correct answer is: ${gameState.currentAnswer}`;
+    gameState.trialCount++;
+    feedbackEl.innerHTML = `<span class="incorrect-icon">&#10008;</span> Incorrect.`;
+    // If three incorrect trials, show game over popup
+    if (gameState.trialCount >= 3) {
+      gameOver();
+    }
   }
 }
 
-// Event listeners for level selection
+function levelComplete() {
+  // Popup for level complete and display current score
+  showModal(`<h3>Sublevel ${gameState.currentSublevel} Complete!</h3><p>Your current score is: ${gameState.score}</p>`, () => {
+    // After closing popup, if not at the last sublevel, go back to menu.
+    if (gameState.currentSublevel < gameState.totalSublevels) {
+      loadBeginnerMenu();
+    } else {
+      // If all sublevels are done, end game.
+      gameOver();
+    }
+    // Check and show high score message if applicable.
+    checkForHighScore();
+  });
+}
+
+function gameOver() {
+  // Save the score
+  saveScore();
+  showModal(`<h3>Game Over</h3><p>Player: ${gameState.playerName}</p><p>Your final score is: ${gameState.score}</p><button id="new-game">Start New Game</button>`, () => {
+    // Do nothing on modal background click.
+  });
+  // Add event listener for new game button in the popup content.
+  document.getElementById("popup-content").addEventListener("click", function (e) {
+    if (e.target && e.target.id === "new-game") {
+      resetGame();
+    }
+  });
+}
+
+function resetGame() {
+  // Reset game state and start from beginner sublevel 1.
+  gameState.currentLevel = "beginner";
+  gameState.currentSublevel = 1;
+  gameState.score = 0;
+  gameState.trialCount = 0;
+  document.getElementById("current-score").textContent = gameState.score;
+  loadBeginnerMenu();
+}
+
+// --------------------
+// Event Listeners for Level Selection and Intro Modal
+// --------------------
 document.querySelectorAll("nav button").forEach(btn => {
   btn.addEventListener("click", function () {
     loadLevel(this.getAttribute("data-level"));
   });
 });
+
+document.getElementById("start-game").addEventListener("click", function () {
+  const nameInput = document.getElementById("player-name").value.trim();
+  if (nameInput === "") {
+    alert("Please enter your name to continue.");
+    return;
+  }
+  gameState.playerName = nameInput;
+  document.getElementById("current-player").textContent = gameState.playerName;
+  hideIntroModal();
+  // Automatically start from beginner level sublevel 1
+  loadBeginnerMenu();
+});
+
+// --------------------
+// Start: Show intro modal on load
+// --------------------
+window.onload = function () {
+  showIntroModal();
+};
