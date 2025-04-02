@@ -108,3 +108,40 @@ button:hover {
     background: #fdedec;
     border: 2px solid var(--error-color);
 }
+
+.correct-icon {
+    color: var(--success-color);
+    font-size: 1.5em;
+    margin-right: 0.5rem;
+}
+
+.incorrect-icon {
+    color: var(--error-color);
+    font-size: 1.5em;
+    margin-right: 0.5rem;
+}
+
+#high-scores {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+.high-score-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+#attempts-left {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+.game-over-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
