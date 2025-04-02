@@ -1,0 +1,38 @@
+{
+    "beginnerLevels": [
+        {
+            "sublevel": 1,
+            "type": "alphabet-recognition",
+            "topic": "Uppercase Letters",
+            "question": "Identify this letter: {letter}",
+            "data": ["A", "B", "C", "D", "E"],
+            "answerType": "case-sensitive"
+        },
+        {
+            "sublevel": 2,
+            "type": "alphabet-recognition",
+            "topic": "Lowercase Letters",
+            "question": "Identify this letter: {letter}",
+            "data": ["a", "b", "c", "d", "e"],
+            "answerType": "case-sensitive"
+        },
+        {
+            "sublevel": 3,
+            "type": "word-formation",
+            "topic": "3-Letter Words",
+            "question": "Form a word using: {letters}",
+            "data": ["CAT", "DOG", "SUN", "BAG", "HAT"],
+            "answerType": "upper"
+        },
+        {
+            "sublevel": 4,
+            "type": "grammar",
+            "topic": "Simple Plurals",
+            "question": "Plural of '{word}':",
+            "data": ["cat", "dog", "book", "pen"],
+            "answerType": "lower",
+            "rule": "add-s"
+        }
+        // Add 496 more sublevels following the progression
+    ]
+}
