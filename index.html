@@ -1,50 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINGUA - English Learning Game</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LINGUA - English Language Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="intro-modal" class="modal active">
-        <div class="modal-content">
-            <h2>Welcome to LINGUA! 🎓</h2>
-            <input type="text" id="player-name" placeholder="Enter your name" required>
-            <button id="start-game">Start Learning</button>
-            <div id="high-scores"></div>
-        </div>
+  <!-- Introduction Modal -->
+  <div id="intro-modal" class="modal">
+    <div class="modal-content">
+      <h2>Welcome to LINGUA! 🎓 </h2>
+      <p>Please enter your name to start playing:</p>
+      <input type="text" id="player-name" placeholder="Your Name" />
+      <button id="start-game">Start Game</button>
     </div>
+  </div>
 
-    <div id="game-over-modal" class="modal">
-        <div class="modal-content">
-            <div id="game-over-content"></div>
-        </div>
+  <!-- Popup Modal for messages -->
+  <div id="popup-modal" class="modal" style="display:none;">
+    <div class="modal-content" id="popup-content">
+      <!-- Content dynamically inserted -->
     </div>
+  </div>
 
-    <header>
-        <h1>LINGUA Language Mastery</h1>
-        <div id="player-info">
-            <span id="current-player">Guest</span> | 
-            Score: <span id="current-score">0</span> | 
-            Attempts Left: <span id="attempts-left">3</span>
-        </div>
-        <div class="progress-container">
-            <div class="progress-bar"></div>
-        </div>
-    </header>
+  <header>
+    <h1>LINGUA - English Language Game</h1>
+    <div id="player-info">Player: <span id="current-player">N/A</span> | Score: <span id="current-score">0</span></div>
+    <nav>
+      <button data-level="beginner">Beginner</button>
+      <button data-level="intermediate">Intermediate</button>
+      <button data-level="conversational">Conversational</button>
+      <button data-level="native">Native</button>
+    </nav>
+  </header>
 
-    <main>
-        <section id="game-container">
-            <div id="question-card" class="card"></div>
-            <div id="interaction-panel">
-                <input type="text" id="answer-input" autocomplete="off">
-                <button id="submit-answer">Check Answer</button>
-            </div>
-            <div id="feedback-message"></div>
-        </section>
-    </main>
-
-    <script src="script.js"></script>
+  <main>
+    <section id="game-container">
+      <!-- Game content will be dynamically loaded here -->
+      <p>Please choose a level above to start or wait for the game to start automatically at Beginner level.</p>
+    </section>
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>
