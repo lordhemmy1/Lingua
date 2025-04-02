@@ -1,24 +1,25 @@
-class GameEngine {
+class LinguaGame {
     constructor() {
-        this.API_ENDPOINT = 'https://wordsapiv1.p.rapidapi.com/words/';
-        this.API_HEADERS = {
-            'X-RapidAPI-Key': 'YOUR_API_KEY',
-            'X-RapidAPI-Host': 'wordsapiv1.p.rapidapi.com'
+        this.gameData = null;
+        this.config = {
+            totalSublevels: 500,
+            apiKey: 'YOUR_WORDS_API_KEY',
+            levels: ['beginner', 'intermediate', 'conversational', 'native']
         };
         
         this.state = {
-            playerName: '',
-            score: 0,
             currentLevel: 'beginner',
             currentSublevel: 1,
-            totalSublevels: 500,
-            progress: []
+            score: 0,
+            playerName: '',
+            progress: {}
         };
     }
 
     async init() {
         await this.loadGameData();
         this.setupEventListeners();
+        this.loadPlayerProgress();
     }
 
     async loadGameData() {
@@ -28,157 +29,122 @@ class GameEngine {
 
     setupEventListeners() {
         document.getElementById('start-game').addEventListener('click', () => this.startGame());
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                this.hideModal();
-            }
-        });
+        document.getElementById('submit-answer').addEventListener('click', () => this.checkAnswer());
     }
 
     startGame() {
         const name = document.getElementById('player-name').value.trim();
-        if (!name) return alert('Please enter your name');
+        if (!name) return this.showError('Please enter your name');
         
         this.state.playerName = name;
-        this.updatePlayerInfo();
-        this.showSublevel(1);
+        this.updatePlayerDisplay();
         this.hideModal();
+        this.loadSublevel(1);
     }
 
-    async showSublevel(number) {
-        if (number > this.state.totalSublevels) return this.showCompletionModal();
+    loadSublevel(sublevelNumber) {
+        if (sublevelNumber > this.config.totalSublevels) {
+            return this.showCompletionScreen();
+        }
         
-        const sublevel = this.gameData[number - 1];
-        this.state.currentSublevel = number;
+        const sublevelData = this.gameData.beginnerLevels.find(
+            level => level.sublevel === sublevelNumber
+        );
         
-        this.renderQuestion(sublevel);
-        this.updateProgress();
+        this.displayQuestion(sublevelData);
+        this.updateProgressDisplay(sublevelNumber);
     }
 
-    renderQuestion(sublevel) {
-        const questionHTML = this.generateQuestionHTML(sublevel);
-        const answerHTML = this.generateAnswerHTML(sublevel);
+    displayQuestion(data) {
+        const questionCard = document.getElementById('question-card');
+        let questionText = data.question;
         
-        document.getElementById('question-container').innerHTML = questionHTML;
-        document.getElementById('answer-container').innerHTML = answerHTML;
+        switch(data.type) {
+            case 'alphabet-recognition':
+                const letter = this.getRandomElement(data.data);
+                questionText = questionText.replace('{letter}', letter);
+                this.currentAnswer = letter;
+                break;
+                
+            case 'word-formation':
+                const letters = this.shuffleWord(this.getRandomElement(data.data));
+                questionText = questionText.replace('{letters}', letters.split('').join(', '));
+                this.currentAnswer = this.getRandomElement(data.data);
+                break;
+        }
         
-        document.getElementById('submit-answer').addEventListener('click', () => this.checkAnswer(sublevel));
-    }
-
-    generateQuestionHTML(sublevel) {
-        return `
-            <div class="question-card">
-                <h2>${sublevel.topic}</h2>
-                <p>${sublevel.question}</p>
-                ${sublevel.data ? `<div class="question-data">${sublevel.data}</div>` : ''}
-            </div>
+        questionCard.innerHTML = `
+            <h2>${data.topic}</h2>
+            <p class="question-text">${questionText}</p>
+            ${data.description ? `<p class="hint">${data.description}</p>` : ''}
         `;
     }
 
-    generateAnswerHTML(sublevel) {
-        return `
-            <input type="text" id="user-answer" placeholder="${sublevel.placeholder || 'Enter your answer'}">
-            <button id="submit-answer" class="primary-btn">Submit Answer</button>
-        `;
-    }
-
-    async checkAnswer(sublevel) {
-        const userAnswer = document.getElementById('user-answer').value.trim();
-        const correctAnswer = sublevel.answer;
-        let isCorrect = false;
-
-        // Case-sensitive validation
-        if (sublevel.caseSensitive) {
-            isCorrect = userAnswer === correctAnswer;
+    async checkAnswer() {
+        const userAnswer = document.getElementById('answer-input').value.trim();
+        const validation = this.validateAnswer(userAnswer);
+        
+        if (validation.correct) {
+            await this.handleCorrectAnswer();
         } else {
-            isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            this.handleIncorrectAnswer(validation.message);
         }
-
-        // API validation for word-based questions
-        if (sublevel.apiValidation && isCorrect) {
-            isCorrect = await this.validateWordViaAPI(userAnswer);
-        }
-
-        this.handleAnswerFeedback(isCorrect, sublevel);
     }
 
-    async validateWordViaAPI(word) {
+    validateAnswer(answer) {
+        const currentSublevel = this.gameData.beginnerLevels.find(
+            l => l.sublevel === this.state.currentSublevel
+        );
+        
+        // Case-sensitive validation
+        if (currentSublevel.answerType === 'case-sensitive' && answer !== this.currentAnswer) {
+            return { correct: false, message: 'Case sensitive answer required' };
+        }
+        
+        // API-based validation for word existence
+        if (currentSublevel.apiValidation) {
+            return this.validateWithAPI(answer);
+        }
+        
+        // Default validation
+        return { correct: answer.toLowerCase() === this.currentAnswer.toLowerCase() };
+    }
+
+    async validateWithAPI(word) {
         try {
-            const response = await fetch(`${this.API_ENDPOINT}${word}`, {
-                headers: this.API_HEADERS
+            const response = await fetch(`https://wordsapiv1.p.rapidapi.com/words/${word}`, {
+                headers: {
+                    'X-RapidAPI-Key': this.config.apiKey,
+                    'X-RapidAPI-Host': 'wordsapiv1.p.rapidapi.com'
+                }
             });
-            return response.ok;
+            return { correct: response.ok };
         } catch (error) {
             console.error('API Validation Error:', error);
-            return false;
+            return { correct: false };
         }
     }
 
-    handleAnswerFeedback(isCorrect, sublevel) {
-        const feedback = document.getElementById('feedback-container');
-        feedback.style.display = 'block';
-        feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    updateProgressDisplay(sublevel) {
+        document.getElementById('current-sublevel').textContent = 
+            `${sublevel}/${this.config.totalSublevels}`;
         
-        if (isCorrect) {
-            feedback.innerHTML = `
-                <span class="correct-icon">✓</span> 
-                <p>Correct! Moving to next level...</p>
-            `;
-            this.state.score += 10;
-            setTimeout(() => this.showSublevel(this.state.currentSublevel + 1), 1500);
-        } else {
-            feedback.innerHTML = `
-                <span class="incorrect-icon">✗</span> 
-                <p>Incorrect. Try again!</p>
-                ${sublevel.hint ? `<p class="hint">Hint: ${sublevel.hint}</p>` : ''}
-            `;
-        }
-        
-        this.updatePlayerInfo();
-    }
-
-    showCompletionModal() {
-        this.showModal(`
-            <h2>Congratulations!</h2>
-            <p>You've completed all 500 beginner levels!</p>
-            <p>Final Score: ${this.state.score}</p>
-            <button class="primary-btn" onclick="game.restartGame()">Restart Beginner</button>
-            <button class="primary-btn" onclick="game.startIntermediate()">Intermediate Level</button>
-        `);
-    }
-
-    updatePlayerInfo() {
-        document.getElementById('current-player').textContent = this.state.playerName;
-        document.getElementById('current-score').textContent = this.state.score;
-        document.getElementById('current-level').textContent = 
-            `Beginner ${this.state.currentSublevel}/${this.state.totalSublevels}`;
-            
-        const progressPercent = (this.state.currentSublevel / this.state.totalSublevels) * 100;
+        const progressPercent = (sublevel / this.config.totalSublevels) * 100;
         document.querySelector('.progress-bar').style.width = `${progressPercent}%`;
     }
 
-    showModal(content) {
-        document.getElementById('game-modal-content').innerHTML = content;
-        document.getElementById('game-modal').classList.add('active');
-    }
-
-    hideModal() {
-        document.getElementById('game-modal').classList.remove('active');
-    }
-
-    restartGame() {
-        this.state.currentSublevel = 1;
-        this.state.score = 0;
-        this.hideModal();
-        this.showSublevel(1);
-    }
-
-    startIntermediate() {
-        // Placeholder for intermediate level implementation
-        this.showModal('<p>Intermediate level coming soon!</p>');
+    showCompletionScreen() {
+        this.showModal(`
+            <h2>🎉 Congratulations! 🎉</h2>
+            <p>You've completed all 500 beginner levels!</p>
+            <div class="button-group">
+                <button class="restart-btn">Restart Beginner</button>
+                <button class="next-level-btn">Start Intermediate</button>
+            </div>
+        `);
     }
 }
 
-// Initialize game
-const game = new GameEngine();
+// Initialize Game
+const game = new LinguaGame();
 game.init();
