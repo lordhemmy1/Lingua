@@ -1,31 +1,28 @@
-// Simple HTML, CSS, and JavaScript-Based English Learning App Structure
-
-// index.html
-
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Learning App</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LINGUA - English Language Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <h1>LINGUA - English Language Game</h1>
     <nav>
-        <a href="#" onclick="showPage('home')">Home</a>
-        <a href="#" onclick="showPage('lesson')">Lessons</a>
-        <a href="#" onclick="showPage('quiz')">Quiz</a>
-        <a href="#" onclick="showPage('progress')">Progress</a>
-    </nav><div id="content">
-    <div id="home" class="page">Welcome to the English Learning App</div>
-    <div id="lesson" class="page" style="display:none;">Lessons will appear here</div>
-    <div id="quiz" class="page" style="display:none;">Quiz Section</div>
-    <div id="progress" class="page" style="display:none;">Progress Tracking</div>
-</div>
+      <button data-level="beginner">Beginner</button>
+      <button data-level="intermediate">Intermediate</button>
+      <button data-level="conversational">Conversational</button>
+      <button data-level="native">Native</button>
+    </nav>
+  </header>
 
-<script src="script.js"></script>
-
+  <main>
+    <section id="game-container">
+      <!-- Game content will be dynamically loaded here -->
+      <p>Please choose a level above to start.</p>
+    </section>
+  </main>
+  <script src="script.js"></script>
 </body>
-</html>// styles.css body { font-family: Arial, sans-serif; text-align: center; } nav a { margin: 10px; text-decoration: none; color: blue; cursor: pointer; } .page { margin-top: 20px; }
-
-// script.js function showPage(pageId) { document.querySelectorAll('.page').forEach(page => { page.style.display = 'none'; }); document.getElementById(pageId).style.display = 'block'; }
-
+</html>
