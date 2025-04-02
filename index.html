@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LINGUA - English Learning Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Welcome Modal -->
+  <div id="intro-modal" class="modal">
+    <div class="modal-content">
+      <h2>Welcome to LINGUA!</h2>
+      <p>Enter your name to begin:</p>
+      <input type="text" id="player-name" placeholder="Your Name">
+      <button id="start-game">Start Game</button>
+    </div>
+  </div>
+
+  <!-- Congratulatory Modal -->
+  <div id="completion-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Congratulations!</h2>
+      <p>You have completed the Beginner Level!</p>
+      <button id="restart-beginner">Restart Beginner</button>
+      <button id="move-intermediate">Proceed to Intermediate</button>
+    </div>
+  </div>
+
+  <header>
+    <h1>LINGUA - English Language Game</h1>
+    <div id="player-info">Player: <span id="current-player">N/A</span> | Score: <span id="current-score">0</span></div>
+  </header>
+
+  <main>
+    <section id="game-container">
+      <p>Click "Start Game" to begin!</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
