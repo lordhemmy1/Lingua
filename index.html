@@ -1,46 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LINGUA - English Language Game</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINGUA - English Learning Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Introduction Modal -->
-  <div id="intro-modal" class="modal">
-    <div class="modal-content">
-      <h2>Welcome to LINGUAL!</h2>
-      <p>Please enter your name to start playing:</p>
-      <input type="text" id="player-name" placeholder="Your Name" />
-      <button id="start-game">Start Game</button>
+    <div id="intro-modal" class="modal active">
+        <div class="modal-content">
+            <h2>Welcome to LINGUA!</h2>
+            <input type="text" id="player-name" placeholder="Enter your name">
+            <button id="start-game">Begin Learning</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Popup Modal for messages -->
-  <div id="popup-modal" class="modal" style="display:none;">
-    <div class="modal-content" id="popup-content">
-      <!-- Content dynamically inserted -->
+    <div id="game-modal" class="modal">
+        <div class="modal-content" id="game-modal-content"></div>
     </div>
-  </div>
 
-  <header>
-    <h1>LINGUA - English Language Game</h1>
-    <div id="player-info">Player: <span id="current-player">N/A</span> | Score: <span id="current-score">0</span></div>
-    <nav>
-      <button data-level="beginner">Beginner</button>
-      <button data-level="intermediate">Intermediate</button>
-      <button data-level="conversational">Conversational</button>
-      <button data-level="native">Native</button>
-    </nav>
-  </header>
+    <header>
+        <h1>LINGUA English Learning Game</h1>
+        <div id="player-info">
+            <span>Player: <span id="current-player">Guest</span></span>
+            <span>Score: <span id="current-score">0</span></span>
+            <span>Level: <span id="current-level">Beginner 1/500</span></span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    </header>
 
-  <main>
-    <section id="game-container">
-      <!-- Game content will be dynamically loaded here -->
-      <p>Please choose a level above to start or wait for the game to start automatically at Beginner level.</p>
-    </section>
-  </main>
-  <script src="script.js"></script>
+    <main>
+        <section id="game-container">
+            <div id="question-container"></div>
+            <div id="answer-container"></div>
+            <div id="feedback-container"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
