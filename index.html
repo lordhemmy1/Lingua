@@ -7,24 +7,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Introduction Modal -->
     <div id="intro-modal" class="modal active">
         <div class="modal-content">
-            <h2>Welcome to LINGUA!</h2>
+            <h2>Welcome to LINGUA! 🇬🇧</h2>
             <input type="text" id="player-name" placeholder="Enter your name">
             <button id="start-game">Begin Learning</button>
         </div>
     </div>
 
-    <div id="game-modal" class="modal">
-        <div class="modal-content" id="game-modal-content"></div>
-    </div>
-
+    <!-- Game Interface -->
     <header>
-        <h1>LINGUA English Learning Game</h1>
+        <h1>LINGUA Language Mastery</h1>
         <div id="player-info">
-            <span>Player: <span id="current-player">Guest</span></span>
-            <span>Score: <span id="current-score">0</span></span>
-            <span>Level: <span id="current-level">Beginner 1/500</span></span>
+            <span id="current-player">Guest</span> | 
+            Level: <span id="current-level">Beginner</span> | 
+            Sublevel: <span id="current-sublevel">0/500</span> | 
+            Score: <span id="current-score">0</span>
         </div>
         <div class="progress-container">
             <div class="progress-bar"></div>
@@ -33,12 +32,16 @@
 
     <main>
         <section id="game-container">
-            <div id="question-container"></div>
-            <div id="answer-container"></div>
-            <div id="feedback-container"></div>
+            <div id="question-card" class="card"></div>
+            <div id="interaction-panel">
+                <input type="text" id="answer-input" autocomplete="off">
+                <button id="submit-answer">Check Answer</button>
+            </div>
+            <div id="feedback-message"></div>
         </section>
     </main>
 
+    <script src="game-data.json"></script>
     <script src="script.js"></script>
 </body>
 </html>
