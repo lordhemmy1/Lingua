@@ -8,11 +8,21 @@ body {
   text-align: center;
 }
 
+.correct-icon {
+  color: green;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
 header {
   background: #333;
   color: #fff;
   padding: 1rem;
   text-align: center;
+}
+
+header h1 {
+  margin: 0;
 }
 
 #player-info {
@@ -80,16 +90,21 @@ button:hover {
   font-weight: bold;
   font-size: 1.2rem;
 }
-
 .incorrect-icon {
   color: red;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
 }
 
 .feedback {
   margin-top: 1rem;
   font-weight: bold;
+}
+
+/* Style for the sublevel grid buttons */
+#sublevel-grid .sublevel-btn {
+  margin: 5px;
+  min-width: 70px;
 }
 
 /* Modal styles */
@@ -117,4 +132,3 @@ button:hover {
   text-align: center;
   border-radius: 5px;
 }
-
