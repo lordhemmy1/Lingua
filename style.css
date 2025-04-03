@@ -132,3 +132,10 @@ button:hover {
   text-align: center;
   border-radius: 5px;
 }
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  #sublevel-grid .sublevel-btn {
+    min-width: 45px;
+    font-size: 0.8rem;
+  }
