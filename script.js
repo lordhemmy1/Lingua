@@ -19,11 +19,11 @@ const topics = [
     name: "Alphabets & Sounds", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Show a letter and its sound (for simplicity, display text sound)
+      // Show a letter and its sound (for simplicity, display text)
       const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const letter = letters.charAt(Math.floor(Math.random() * letters.length));
-      gameState.currentAnswer = letter; // case sensitive: must be uppercase.
-      return `Identify the letter and its sound: <strong>${letter}</strong><br>(Expected answer: uppercase letter)`;
+      gameState.currentAnswer = letter; // Expected answer: uppercase letter.
+      return `Identify the letter and its sound: <strong>${letter}</strong><br>(Answer must be in uppercase)`;
     }
   },
   { 
@@ -60,14 +60,14 @@ const topics = [
       const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const letter = letters.charAt(Math.floor(Math.random() * letters.length));
       gameState.currentAnswer = vowels.includes(letter) ? "VOWEL" : "CONSONANT";
-      return `Is the letter <strong>${letter}</strong> a vowel or a consonant? (Answer in uppercase)`;
+      return `Is the letter <strong>${letter}</strong> a VOWEL or a CONSONANT?`;
     }
   },
   { 
     name: "Dictation (Fill the Gap)", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Simulate a dictation where a sentence is missing a word.
+      // Simulate a dictation with a missing word.
       const sentences = [
         { sentence: "I ____ to school every day.", answer: "GO" },
         { sentence: "She ____ a book.", answer: "READS" }
@@ -111,7 +111,7 @@ const topics = [
     name: "Articles", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Ask about use of articles.
+      // Ask about the use of articles.
       const questions = [
         { q: "Which article is used before a vowel sound? (A, AN, or THE)", answer: "AN" },
         { q: "Which article is used for a specific object? (A, AN, or THE)", answer: "THE" }
@@ -140,14 +140,14 @@ const topics = [
     name: "Present Tense", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Convert a sentence to simple present tense.
+      // Fill in a sentence in simple present tense.
       const sentences = [
         { sentence: "She ____ (to go) to school.", answer: "GOES" },
         { sentence: "He ____ (to eat) breakfast.", answer: "EATS" }
       ];
       const item = sentences[Math.floor(Math.random() * sentences.length)];
       gameState.currentAnswer = item.answer;
-      return `Fill in the blank in present tense: <strong>${item.sentence}</strong>`;
+      return `Complete the sentence in present tense: <strong>${item.sentence}</strong>`;
     }
   },
   { 
@@ -168,38 +168,38 @@ const topics = [
     name: "Tenses & Participles", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Ask for present, past and past participle forms.
+      // Provide the base, past, and past participle forms.
       const verbs = [
         { base: "GO", past: "WENT", participle: "GONE" },
         { base: "EAT", past: "ATE", participle: "EATEN" }
       ];
       const verb = verbs[Math.floor(Math.random() * verbs.length)];
       gameState.currentAnswer = `${verb.base} ${verb.past} ${verb.participle}`;
-      return `Provide the base form, simple past, and past participle of the verb: <strong>${verb.base}</strong><br>(Separate your answers by spaces, in uppercase)`;
+      return `Provide the base form, simple past, and past participle of: <strong>${verb.base}</strong><br>(Separate answers by spaces, in uppercase)`;
     }
   },
   { 
     name: "Comparatives & Superlatives", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Ask for the comparative and superlative forms.
+      // Provide the positive, comparative, and superlative forms.
       const adjectives = [
         { positive: "FAST", comparative: "FASTER", superlative: "FASTEST" },
         { positive: "SMART", comparative: "SMARTER", superlative: "SMARTEST" }
       ];
       const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
       gameState.currentAnswer = `${adj.positive} ${adj.comparative} ${adj.superlative}`;
-      return `Provide the positive, comparative, and superlative forms for: <strong>${adj.positive}</strong><br>(Separate answers by spaces, in uppercase)`;
+      return `Provide the positive, comparative, and superlative forms for <strong>${adj.positive}</strong><br>(Separate by spaces, in uppercase)`;
     }
   },
   { 
     name: "Sentence Formation", 
-    sublevels: 32, 
+    sublevels: 28, 
     generateQuestion: () => {
-      // Provide a set of words to form a sentence.
+      // Provide a set of words for sentence formation.
       const words = ["I", "LOVE", "LEARNING", "ENGLISH"];
-      gameState.currentAnswer = ""; // Open answer; assumed correct if not empty.
-      return `Form a complete sentence using these words (order is not fixed): <strong>${words.join(" ")}</strong>`;
+      gameState.currentAnswer = ""; // Open answer; accept any non-empty response.
+      return `Form a complete sentence using these words (order not fixed): <strong>${words.join(" ")}</strong>`;
     }
   }
 ];
@@ -218,13 +218,12 @@ function getCurrentTopic(sublevel) {
 }
 
 // --------------------
-// Dictionary API example (using free dictionary API)
+// Dictionary API example (free dictionary API)
 // --------------------
 async function lookupWord(word) {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
     const data = await res.json();
-    // Return the first definition as an example.
     return data[0]?.meanings[0]?.definitions[0]?.definition || "Definition not found.";
   } catch (error) {
     return "Definition not found.";
@@ -240,7 +239,6 @@ function showModal(contentHTML, callback) {
   popupContent.innerHTML = contentHTML;
   popup.style.display = "block";
   popup.onclick = function (e) {
-    // Prevent closing if clicking on a button
     if (e.target.tagName !== "BUTTON") {
       popup.style.display = "none";
       if (callback) callback();
@@ -282,7 +280,7 @@ function checkForHighScore() {
 // Game Flow Functions
 // --------------------
 
-// Load Beginner Level Menu: display 500 sublevels in a grid (2 rows)
+// Load Beginner Level Menu: display 500 sublevels in a grid.
 function loadBeginnerMenu() {
   gameState.currentLevel = "beginner";
   const container = document.getElementById("game-container");
@@ -290,14 +288,14 @@ function loadBeginnerMenu() {
   html += `<p>Select a sublevel:</p>`;
   html += `<div id="sublevel-grid" class="row">`;
   for (let i = 1; i <= gameState.totalSublevels; i++) {
-    html += `<div class="col-6 col-md-2 mb-2">
+    html += `<div class="col-6 col-sm-4 col-md-2 mb-2">
                <button class="btn btn-outline-primary sublevel-btn" data-sublevel="${i}">SL ${i}</button>
              </div>`;
   }
   html += `</div>`;
   container.innerHTML = html;
 
-  // Add event listeners for sublevel buttons
+  // Add event listeners for sublevel buttons.
   document.querySelectorAll(".sublevel-btn").forEach(btn => {
     btn.addEventListener("click", function () {
       const sublevel = parseInt(this.getAttribute("data-sublevel"));
@@ -306,19 +304,17 @@ function loadBeginnerMenu() {
   });
 }
 
-// Start a given sublevel based on number.
+// Start a given sublevel.
 function startSublevel(sublevelNumber) {
   gameState.currentSublevel = sublevelNumber;
   gameState.trialCount = 0;
-  // Determine topic based on sublevel.
   const topic = getCurrentTopic(sublevelNumber);
   if (!topic) return;
-  // Generate question from current topic.
   const questionHTML = topic.generateQuestion();
   displayQuestion(topic.name, questionHTML);
 }
 
-// Display a question with answer input.
+// Display question and answer input.
 function displayQuestion(topicName, questionHTML) {
   const container = document.getElementById("game-container");
   let html = `<h2>Beginner - Sublevel ${gameState.currentSublevel}: ${topicName}</h2>`;
@@ -333,13 +329,13 @@ function displayQuestion(topicName, questionHTML) {
   document.getElementById("back-to-menu").addEventListener("click", loadBeginnerMenu);
 }
 
-// Check answer (case sensitive for uppercase answers).
+// Check answer; enforce uppercase if expected answer is uppercase.
 function checkAnswer() {
   const userAnswer = document.getElementById("user-answer").value.trim();
   const expected = gameState.currentAnswer || "";
   const feedbackEl = document.getElementById("feedback");
 
-  // For open-answer questions (e.g. sentence formation), accept any non-empty answer.
+  // For open-answer questions (e.g., sentence formation), accept any non-empty answer.
   if (expected === "") {
     if (userAnswer.length > 0) {
       feedbackEl.innerHTML = `<span class="correct-icon">&#10004;</span> Answer recorded.`;
@@ -351,7 +347,7 @@ function checkAnswer() {
     return;
   }
   
-  // Enforce case sensitivity for uppercase expected answers.
+  // Enforce uppercase if expected answer is uppercase.
   if (expected === expected.toUpperCase() && userAnswer !== userAnswer.toUpperCase()) {
     feedbackEl.innerHTML = `<span class="incorrect-icon">&#10008;</span> Please enter your answer in uppercase.`;
     gameState.trialCount++;
@@ -365,7 +361,6 @@ function checkAnswer() {
     gameState.trialCount++;
   }
   
-  // If 3 trials reached, game over.
   if (gameState.trialCount >= 3) {
     gameOver();
   }
@@ -376,7 +371,6 @@ function nextSublevel() {
   if (gameState.currentSublevel < gameState.totalSublevels) {
     startSublevel(gameState.currentSublevel + 1);
   } else {
-    // Completed beginner class.
     saveScore();
     showModal(`<h3>Congratulations, ${gameState.playerName}!</h3>
                <p>You have completed the Beginner Class with a score of ${gameState.score}.</p>
@@ -386,7 +380,6 @@ function nextSublevel() {
       if (e.target && e.target.id === "restart-beginner") {
         resetGame();
       } else if (e.target && e.target.id === "go-intermediate") {
-        // For demo, simply alert.
         alert("Intermediate level is under construction.");
       }
     });
@@ -424,7 +417,6 @@ document.querySelectorAll("nav button").forEach(btn => {
     if (level === "beginner") {
       loadBeginnerMenu();
     } else {
-      // Placeholder for other levels.
       document.getElementById("game-container").innerHTML = `<p>${level} level is under construction.</p>`;
     }
   });
@@ -439,7 +431,7 @@ document.getElementById("start-game").addEventListener("click", function () {
   gameState.playerName = nameInput;
   document.getElementById("current-player").textContent = gameState.playerName;
   hideIntroModal();
-  // Automatically start Beginner class at sublevel 1.
+  // Automatically start beginner class at sublevel 1.
   loadBeginnerMenu();
 });
 
