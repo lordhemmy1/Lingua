@@ -12,43 +12,90 @@ const gameState = {
 
 const SCORE_STORAGE_KEY = "linguaScores";
 
-// Define topics with progression ranges and generator functions.
-// There are 14 topics; we assign roughly equal numbers to cover 500 sublevels.
+// ----- Helper Functions -----
+
+// Shuffle an array using Fisher-Yates algorithm.
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// ----- Dictionary / Word Data for Anagrams -----
+// Mapping sorted letters (string) to array of valid anagrams.
+const wordAnagrams = {
+  "KOOB": ["BOOK", "KOBO"],
+  "ACT": ["CAT", "ACT"],
+  "ABT": ["BAT", "TAB"]
+};
+
+// Get a random key from wordAnagrams.
+function getRandomAnagramKey() {
+  const keys = Object.keys(wordAnagrams);
+  return keys[Math.floor(Math.random() * keys.length)];
+}
+
+// ----- Topics Definition -----
+// There are 14 topics covering 500 sublevels.
+// The number of sublevels per topic is adjusted accordingly.
 const topics = [
   { 
     name: "Alphabets & Sounds", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Show a letter and its sound (for simplicity, display text)
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      // Mix upper and lower cases randomly.
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
       const letter = letters.charAt(Math.floor(Math.random() * letters.length));
-      gameState.currentAnswer = letter; // Expected answer: uppercase letter.
-      return `Identify the letter and its sound: <strong>${letter}</strong><br>(Answer must be in uppercase)`;
+      gameState.currentAnswer = letter; // expected answer exactly as generated.
+      return `Identify the letter and its sound: <strong>${letter}</strong><br>(Answer must match the case)`;
     }
   },
   { 
     name: "Letter Combinations", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Combine letters to form a word.
-      const words = ["CAT", "DOG", "SUN", "BOOK", "TREE"];
-      const word = words[Math.floor(Math.random() * words.length)];
-      const shuffled = word.split("").sort(() => 0.5 - Math.random()).join("");
-      gameState.currentAnswer = word;
-      return `Rearrange the letters to form a word: <strong>${shuffled}</strong>`;
+      // Use the wordAnagrams dictionary.
+      const key = getRandomAnagramKey();
+      const validAnswers = wordAnagrams[key];
+      // Choose one valid answer as the "base word".
+      const baseWord = validAnswers[0];
+      // Create an array of letters.
+      const letters = baseWord.split("");
+      // Shuffle until the scrambled version is different from any valid answer.
+      let shuffled;
+      do {
+        shuffled = shuffleArray([...letters]).join("");
+      } while (validAnswers.includes(shuffled));
+      gameState.currentAnswer = validAnswers.join("/"); // Store all valid answers separated by slash.
+      return `Rearrange the letters to form a word: <strong>${shuffled}</strong><br>(Acceptable answers: ${gameState.currentAnswer})`;
     }
   },
   { 
     name: "Fill in the Gaps", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Provide a word with a missing letter.
+      // Use a small dictionary array.
       const words = ["ELEPHANT", "COMPUTER", "LANGUAGE", "KNOWLEDGE"];
       const word = words[Math.floor(Math.random() * words.length)];
-      const index = Math.floor(Math.random() * word.length);
+      // Choose a random index (not first or last to keep it interesting)
+      const index = Math.floor(Math.random() * (word.length - 2)) + 1;
+      const correctLetter = word.charAt(index);
+      // Generate two random letters different from the correct one.
+      let options = [correctLetter];
+      while (options.length < 3) {
+        const randomLetter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26));
+        if (!options.includes(randomLetter)) {
+          options.push(randomLetter);
+        }
+      }
+      // Shuffle options.
+      options = shuffleArray(options);
+      // Create gap word with a blank.
       const gapWord = word.substring(0, index) + "_" + word.substring(index + 1);
-      gameState.currentAnswer = word;
-      return `Fill in the gap: <strong>${gapWord}</strong>`;
+      gameState.currentAnswer = correctLetter;
+      return `Complete the word: <strong>${gapWord}</strong> (${options.join(", ")})`;
     }
   },
   { 
@@ -168,21 +215,21 @@ const topics = [
     name: "Tenses & Participles", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Provide the base, past, and past participle forms.
+      // Provide base, past, and past participle forms.
       const verbs = [
         { base: "GO", past: "WENT", participle: "GONE" },
         { base: "EAT", past: "ATE", participle: "EATEN" }
       ];
       const verb = verbs[Math.floor(Math.random() * verbs.length)];
       gameState.currentAnswer = `${verb.base} ${verb.past} ${verb.participle}`;
-      return `Provide the base form, simple past, and past participle of: <strong>${verb.base}</strong><br>(Separate answers by spaces, in uppercase)`;
+      return `Provide the base form, simple past, and past participle of: <strong>${verb.base}</strong><br>(Separate by spaces, in uppercase)`;
     }
   },
   { 
     name: "Comparatives & Superlatives", 
     sublevels: 36, 
     generateQuestion: () => {
-      // Provide the positive, comparative, and superlative forms.
+      // Provide positive, comparative, and superlative forms.
       const adjectives = [
         { positive: "FAST", comparative: "FASTER", superlative: "FASTEST" },
         { positive: "SMART", comparative: "SMARTER", superlative: "SMARTEST" }
@@ -198,7 +245,7 @@ const topics = [
     generateQuestion: () => {
       // Provide a set of words for sentence formation.
       const words = ["I", "LOVE", "LEARNING", "ENGLISH"];
-      gameState.currentAnswer = ""; // Open answer; accept any non-empty response.
+      gameState.currentAnswer = ""; // Open answer; any non-empty answer accepted.
       return `Form a complete sentence using these words (order not fixed): <strong>${words.join(" ")}</strong>`;
     }
   }
@@ -217,9 +264,8 @@ function getCurrentTopic(sublevel) {
   return topics.find(topic => sublevel >= topic.start && sublevel <= topic.end);
 }
 
-// --------------------
-// Dictionary API example (free dictionary API)
-// --------------------
+// ----- Dictionary API Example -----
+// (This function remains available for extension purposes.)
 async function lookupWord(word) {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
@@ -230,9 +276,7 @@ async function lookupWord(word) {
   }
 }
 
-// --------------------
-// Modal Helpers
-// --------------------
+// ----- Modal Helpers -----
 function showModal(contentHTML, callback) {
   const popup = document.getElementById("popup-modal");
   const popupContent = document.getElementById("popup-content");
@@ -254,9 +298,7 @@ function hideIntroModal() {
   document.getElementById("intro-modal").style.display = "none";
 }
 
-// --------------------
-// Score Management
-// --------------------
+// ----- Score Management -----
 function updateScore(amount) {
   gameState.score += amount;
   document.getElementById("current-score").textContent = gameState.score;
@@ -276,9 +318,7 @@ function checkForHighScore() {
   }
 }
 
-// --------------------
-// Game Flow Functions
-// --------------------
+// ----- Game Flow Functions -----
 
 // Load Beginner Level Menu: display 500 sublevels in a grid.
 function loadBeginnerMenu() {
@@ -329,13 +369,13 @@ function displayQuestion(topicName, questionHTML) {
   document.getElementById("back-to-menu").addEventListener("click", loadBeginnerMenu);
 }
 
-// Check answer; enforce uppercase if expected answer is uppercase.
+// Check answer; enforce uppercase when required.
 function checkAnswer() {
   const userAnswer = document.getElementById("user-answer").value.trim();
   const expected = gameState.currentAnswer || "";
   const feedbackEl = document.getElementById("feedback");
 
-  // For open-answer questions (e.g., sentence formation), accept any non-empty answer.
+  // For open-answer questions (e.g., Sentence Formation), accept any non-empty answer.
   if (expected === "") {
     if (userAnswer.length > 0) {
       feedbackEl.innerHTML = `<span class="correct-icon">&#10004;</span> Answer recorded.`;
@@ -347,8 +387,22 @@ function checkAnswer() {
     return;
   }
   
-  // Enforce uppercase if expected answer is uppercase.
-  if (expected === expected.toUpperCase() && userAnswer !== userAnswer.toUpperCase()) {
+  // For letter combination, allow multiple correct answers.
+  // The expected answer for letter combination is stored as "BOOK/KOBO" etc.
+  if (expected.includes("/")) {
+    const validAnswers = expected.split("/");
+    if (validAnswers.includes(userAnswer)) {
+      feedbackEl.innerHTML = `<span class="correct-icon">&#10004;</span> Correct!`;
+      updateScore(1);
+      setTimeout(nextSublevel, 1500);
+      return;
+    } else {
+      feedbackEl.innerHTML = `<span class="incorrect-icon">&#10008;</span> Incorrect.`;
+      gameState.trialCount++;
+    }
+  }
+  // Enforce uppercase if expected answer is all uppercase.
+  else if (expected === expected.toUpperCase() && userAnswer !== userAnswer.toUpperCase()) {
     feedbackEl.innerHTML = `<span class="incorrect-icon">&#10008;</span> Please enter your answer in uppercase.`;
     gameState.trialCount++;
   } else if (userAnswer === expected) {
@@ -400,6 +454,7 @@ function gameOver() {
 }
 
 function resetGame() {
+  // Reset game state and restart beginner level.
   gameState.currentLevel = "beginner";
   gameState.currentSublevel = 1;
   gameState.score = 0;
@@ -408,9 +463,8 @@ function resetGame() {
   loadBeginnerMenu();
 }
 
-// --------------------
-// Event Listeners for Level Selection and Intro Modal
-// --------------------
+// ----- Event Listeners -----
+// Level selection buttons.
 document.querySelectorAll("nav button").forEach(btn => {
   btn.addEventListener("click", function () {
     const level = this.getAttribute("data-level");
@@ -422,6 +476,7 @@ document.querySelectorAll("nav button").forEach(btn => {
   });
 });
 
+// When the user clicks "Start Game" in the intro modal.
 document.getElementById("start-game").addEventListener("click", function () {
   const nameInput = document.getElementById("player-name").value.trim();
   if (nameInput === "") {
@@ -431,11 +486,11 @@ document.getElementById("start-game").addEventListener("click", function () {
   gameState.playerName = nameInput;
   document.getElementById("current-player").textContent = gameState.playerName;
   hideIntroModal();
-  // Automatically start beginner class at sublevel 1.
+  // Automatically start beginner level at sublevel 1.
   loadBeginnerMenu();
 });
 
-// Start by showing the intro modal.
+// Show intro modal on load.
 window.onload = function () {
   showIntroModal();
 };
