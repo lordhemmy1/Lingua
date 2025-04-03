@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LINGUA - English Learning Game</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LINGUA - English Language Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- Welcome Modal -->
+  <!-- Introduction Modal -->
   <div id="intro-modal" class="modal">
     <div class="modal-content">
-      <h2>Welcome to LINGUA! 🎓 </h2>
-      <p>Enter your name to begin:</p>
-      <input type="text" id="player-name" placeholder="Your Name">
+      <h2>Welcome to LINGUA!🎓 </h2>
+      <p>Please enter your name to start playing:</p>
+      <input type="text" id="player-name" placeholder="Your Name" />
       <button id="start-game">Start Game</button>
     </div>
   </div>
 
-  <!-- Congratulatory Modal -->
-  <div id="completion-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h2>Congratulations!</h2>
-      <p>You have completed the Beginner Level!</p>
-      <button id="restart-beginner">Restart Beginner</button>
-      <button id="move-intermediate">Proceed to Intermediate</button>
+  <!-- Popup Modal for messages -->
+  <div id="popup-modal" class="modal" style="display:none;">
+    <div class="modal-content" id="popup-content">
+      <!-- Content dynamically inserted -->
     </div>
   </div>
 
   <header>
     <h1>LINGUA - English Language Game</h1>
     <div id="player-info">Player: <span id="current-player">N/A</span> | Score: <span id="current-score">0</span></div>
+    <nav>
+      <button data-level="beginner">Beginner</button>
+      <button data-level="intermediate">Intermediate</button>
+      <button data-level="conversational">Conversational</button>
+      <button data-level="native">Native</button>
+    </nav>
   </header>
 
   <main>
     <section id="game-container">
-      <p>Click "Start Game" to begin!</p>
+      <!-- Game content will be dynamically loaded here -->
+      <p>Please choose a level above to start or wait for the game to start automatically at Beginner level.</p>
     </section>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
