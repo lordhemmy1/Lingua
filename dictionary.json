@@ -1,0 +1,44 @@
+[
+  {
+    "word": "apple",
+    "partOfSpeech": "noun",
+    "definition": "A round fruit with red or green skin and a whitish interior.",
+    "example": "She ate an apple for lunch."
+  },
+  {
+    "word": "run",
+    "partOfSpeech": "verb",
+    "definition": "To move quickly on foot.",
+    "example": "He can run very fast."
+  },
+  {
+    "word": "beautiful",
+    "partOfSpeech": "adjective",
+    "definition": "Pleasing the senses or mind aesthetically.",
+    "example": "The sunset was beautiful."
+  },
+  {
+    "word": "quickly",
+    "partOfSpeech": "adverb",
+    "definition": "At a fast speed.",
+    "example": "She ran quickly to catch the bus."
+  },
+  {
+    "word": "on",
+    "partOfSpeech": "preposition",
+    "definition": "Physically in contact with and supported by a surface.",
+    "example": "The book is on the table."
+  },
+  {
+    "word": "and",
+    "partOfSpeech": "conjunction",
+    "definition": "Used to connect words of the same part of speech, clauses, or sentences.",
+    "example": "I like apples and oranges."
+  },
+  {
+    "word": "wow",
+    "partOfSpeech": "interjection",
+    "definition": "Used to express astonishment or admiration.",
+    "example": "Wow! That’s amazing."
+  }
+]
